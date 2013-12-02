@@ -1314,7 +1314,9 @@
 				'option_clear'   : 'onOptionClear',
 				'dropdown_open'  : 'onDropdownOpen',
 				'dropdown_close' : 'onDropdownClose',
-				'type'           : 'onType'
+				'type'           : 'onType',
+				'focus'          : 'onFocus',
+				'blur'           : 'onBlur'
 			};
 	
 			for (key in callbacks) {
@@ -1522,7 +1524,8 @@
 		 */
 		onFocus: function(e) {
 			var self = this;
-	
+			var wasFocused = self.isFocused;
+			
 			self.isFocused = true;
 			if (self.isDisabled) {
 				self.blur();
@@ -1532,6 +1535,8 @@
 	
 			if (self.ignoreFocus) return;
 			if (self.settings.preload === 'focus') self.onSearchChange('');
+	
+			if (!wasFocused) self.trigger('focus');
 	
 			if (!self.$activeItems.length) {
 				self.showInput();
@@ -1550,12 +1555,16 @@
 		 */
 		onBlur: function(e) {
 			var self = this;
+			var wasFocused = self.isFocused;
+	
 			self.isFocused = false;
 			if (self.ignoreFocus) return;
 	
 			if (self.settings.create && self.settings.createOnBlur) {
 				self.createItem();
 			}
+	
+			if (wasFocused) self.trigger('blur');
 	
 			self.close();
 			self.setTextboxValue('');
