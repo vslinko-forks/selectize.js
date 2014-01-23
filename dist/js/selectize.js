@@ -941,7 +941,12 @@
 		onFocus: function(e) {
 			var self = this;
 			var wasFocused = self.isFocused;
-			
+
+      if (self.preventFocusAfterIEBlur) {
+		    self.preventFocusAfterIEBlur = false;
+		    return;
+		  }
+
 			self.isFocused = true;
 			if (self.isDisabled) {
 				self.blur();
@@ -975,7 +980,17 @@
 	
 			self.isFocused = false;
 			if (self.ignoreFocus) return;
-	
+
+      if (!!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() )) {
+        if (document.activeElement === self.$dropdown_content[0]) {
+          if ($(document.activeElement)[0].tagName === "DIV") {
+            self.preventFocusAfterIEBlur = true;
+            self.$control_input.focus();
+          }
+          return;
+        }
+      }
+
 			if (self.settings.create && self.settings.createOnBlur) {
 				self.createItem();
 			}
